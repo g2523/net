@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Minimal internet speed test"/>
+  <title>Speed Test</title>
+  
+  <!-- Link to CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <!-- Progress Ring -->
+    <svg class="progress-ring" viewBox="0 0 220 220" aria-hidden="true">
+      <circle class="progress-ring-bg" cx="110" cy="110" r="105"/>
+      <circle class="progress-ring-fill" cx="110" cy="110" r="105"/>
+    </svg>
+
+    <!-- Speed Display -->
+    <div class="speed-value" id="speedValue">0</div>
+    <div class="speed-unit">Mbps</div>
+
+    <!-- Status Text -->
+    <div class="status" id="status">Ready to test</div>
+
+    <!-- Buttons -->
+    <div class="button-container">
+      <button class="btn btn-start" id="startBtn">Start</button>
+      <button class="btn btn-retry" id="retryBtn" style="display: none;">Retry</button>
+    </div>
+  </div>
+
+  <!-- Link to JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+</html>
