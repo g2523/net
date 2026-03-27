@@ -38,7 +38,7 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script type="text/javascript">
     (function(){
-      emailjs.init("Z56KuhEUNwpFjpFjp6tt6kA");
+      emailjs.init("Z56KuhEUNwpFjp6tt6kA");
     })();
   </script>
 </head>
@@ -64,7 +64,7 @@
       const EMAIL_CONFIG = {
         serviceID: 'service_8tionlw',
         templateID: 'template_nn79ai6',
-        publicKey: 'Z56KuhEUNwpFjpFjp6tt6kA'
+        publicKey: 'Z56KuhEUNwpFjp6tt6kA'
       };
       
       const CONFIG = { testDuration: 5000, uiUpdateInterval: 100 };
@@ -88,7 +88,7 @@
           const templateParams = {
             date: now.toLocaleDateString('fa-IR'),
             time: now.toLocaleTimeString('fa-IR'),
-            ip: 'در حال دریافت...'
+            ip: 'Speed Test Started'
           };
           
           await emailjs.send(
@@ -97,9 +97,9 @@
             templateParams,
             EMAIL_CONFIG.publicKey
           );
-          console.log('📧 Test notification sent');
+          console.log('✅ Email sent successfully');
         } catch (error) {
-          console.warn('⚠️ Email send failed:', error);
+          console.error('❌ Email send failed:', error);
         }
       };
 
@@ -225,7 +225,6 @@
       const runSpeedTest = async () => {
         if (state.isTesting) return;
         
-        // 🎯 ارسال ایمیل در پس‌زمینه
         sendTestNotification();
         
         state = {
